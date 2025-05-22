@@ -319,8 +319,7 @@ class ProjectManagementApp:
         ttk.Button(btn_frame, text="Thêm công việc", command=self.create_task_screen).pack(side=tk.LEFT, padx=5)
         ttk.Button(btn_frame, text="Sửa công việc", command=self.edit_task_screen).pack(side=tk.LEFT, padx=5)
         ttk.Button(btn_frame, text="Xóa công việc", command=self.delete_task).pack(side=tk.LEFT, padx=5)
-        ttk.Button(btn_frame, text="Lấy dữ liệu mẫu", command=self.fetch_and_save_sample_tasks).pack(side=tk.LEFT, padx=5)
-        ttk.Button(btn_frame, text="Xem tiến độ", command=self.show_progress).pack(side=tk.LEFT, padx=5)
+        ttk.Button(btn_frame, text="Cấu hình Google Sheets", command=self.create_config_screen).pack(side=tk.LEFT, padx=5)
     
         if self.is_admin:
             ttk.Button(btn_frame, text="Xem lịch sử", command=self.show_history).pack(side=tk.LEFT, padx=5)
@@ -858,26 +857,6 @@ class ProjectManagementApp:
             if 0 < time_diff <= 24 and task["status"] != "Done":
                 messagebox.showwarning("Nhắc nhở", f"Công việc '{task['title']}' sắp đến hạn: {task['deadline']}")
 
-    def show_progress(self):
-        total_tasks = len(self.tasks)
-        if total_tasks == 0:
-            messagebox.showinfo("Tiến độ", "Chưa có công việc nào.")
-            return
-        
-        done_tasks = sum(1 for task in self.tasks if task["status"] == "Done")
-        progress = (done_tasks / total_tasks) * 100
-        
-        fig, ax = plt.subplots(figsize=(5, 3))
-        ax.pie([done_tasks, total_tasks - done_tasks], labels=["Done", "Remaining"], autopct='%1.1f%%', startangle=90, colors=['#4CAF50', '#FFCDD2'])
-        ax.set_title("Tiến độ dự án")
-        
-        progress_window = tk.Toplevel(self.root)
-        progress_window.title("Tiến độ dự án")
-        progress_window.configure(bg='white')
-        canvas = FigureCanvasTkAgg(fig, master=progress_window)
-        canvas.draw()
-        canvas.get_tk_widget().pack(pady=20)
-
     def save_task(self):
         title = self.title_entry.get()
         description = self.desc_entry.get()
@@ -1136,23 +1115,6 @@ class ProjectManagementApp:
         for project in projects:
             self.project_menu['menu'].add_command(label=project, command=lambda p=project: self.project_var.set(p))
 
-    def fetch_and_save_sample_tasks(self):
-        if not self.is_admin:
-            messagebox.showerror("Lỗi", "Chỉ quản trị viên mới có thể lấy dữ liệu mẫu")
-            return
-        
-        sample_tasks = fetch_sample_tasks()
-        if sample_tasks:
-            self.tasks.extend(sample_tasks)
-            for task in sample_tasks:
-                self.log_history("Created (Sample)", task)
-                self.append_task_to_sheet(task)
-            write_json(TASKS_FILE, self.tasks)
-            self.load_tasks()
-            self.project_menu['menu'].delete(0, 'end')
-            projects = ["All"] + list(set(task["project_name"] for task in self.tasks))
-            for project in projects:
-                self.project_menu['menu'].add_command(label=project, command=lambda p=project: self.project_var.set(p))
 
     def log_history(self, action, task):
         history_entry = {
