@@ -26,7 +26,7 @@ def decode_data(encoded_data):
     except:
         return encoded_data
 
-# Hàm để đọc và ghi JSON (giữ nguyên từ code gốc)
+# Hàm để đọc và ghi JSON
 def read_json(file_path, default_data):
     if os.path.exists(file_path):
         try:
@@ -45,7 +45,7 @@ def write_json(file_path, data):
     except Exception as e:
         messagebox.showerror("Lỗi", f"Không thể ghi file: {e}")
 
-# Hàm lấy dữ liệu mẫu từ API (giữ nguyên từ code gốc)
+# Hàm lấy dữ liệu mẫu từ API
 def fetch_sample_tasks():
     try:
         response = requests.get("https://jsonplaceholder.typicode.com/todos")
@@ -121,7 +121,6 @@ class ProjectManagementApp:
             self.setup_google_sheets()
 
     def setup_google_sheets(self):
-        # Giữ nguyên từ code gốc
         try:
             creds = Credentials.from_service_account_file(self.config["CREDENTIALS_FILE"], scopes=self.SCOPES)
             self.gspread_client = gspread.authorize(creds)
@@ -247,7 +246,7 @@ class ProjectManagementApp:
         main_frame = ttk.Frame(self.root, padding=20, style='Main.TFrame')
         main_frame.pack(fill=tk.BOTH, expand=True)
     
-        # Frame cho nút đăng xuất ở góc phải trên
+        # Frame cho nút đăng xuất
         top_frame = ttk.Frame(main_frame)
         top_frame.pack(anchor="ne")
         ttk.Button(top_frame, text="Đăng xuất", command=self.create_login_screen, style='Secondary.TButton').pack(side=tk.RIGHT, padx=5)
@@ -267,9 +266,9 @@ class ProjectManagementApp:
         project_frame = ttk.Frame(main_frame)
         project_frame.pack(fill=tk.X, pady=5)
         ttk.Label(project_frame, text="Dự án").pack(side=tk.LEFT, padx=5)
-        self.project_var = tk.StringVar(value="All")
-        projects = ["All"] + list(set(task["project_name"] for task in self.tasks))
-        self.project_menu = ttk.OptionMenu(project_frame, self.project_var, "All", *projects, command=self.filter_tasks_by_project)
+        self.project_var = tk.StringVar(value="Tất cả")
+        projects = ["Tất cả"] + list(set(task["project_name"] for task in self.tasks))
+        self.project_menu = ttk.OptionMenu(project_frame, self.project_var, "Tất cả", *projects, command=self.filter_tasks_by_project)
         self.project_menu.pack(side=tk.LEFT, padx=5)
     
         # Frame chọn chế độ xem
@@ -320,7 +319,6 @@ class ProjectManagementApp:
         if self.is_admin:
             ttk.Button(btn_frame, text="Xem lịch sử", command=self.show_history).pack(side=tk.LEFT, padx=5)
             ttk.Button(btn_frame, text="Quản lý người dùng", command=self.create_user_management_screen).pack(side=tk.LEFT, padx=5)
-            ttk.Button(btn_frame, text="Cấu hình Google Sheets", command=self.create_config_screen).pack(side=tk.LEFT, padx=5)
     
         self.load_tasks()
 
@@ -337,13 +335,13 @@ class ProjectManagementApp:
     
         detail_window = tk.Toplevel(self.root)
         detail_window.title(f"Chi tiết công việc: {task['title']}")
-        detail_window.geometry("600x705")  # Điều chỉnh kích thước để chứa bố cục ngang
+        detail_window.geometry("600x705") 
         detail_window.configure(bg='white')
     
         main_frame = ttk.Frame(detail_window, padding=20)
         main_frame.pack(fill=tk.BOTH, expand=True)
     
-        # Frame cho nút Đóng ở góc phải trên
+        # Frame cho nút Đóng
         top_frame = ttk.Frame(main_frame)
         top_frame.pack(anchor="ne")
         ttk.Button(top_frame, text="Đóng", command=detail_window.destroy, style='Secondary.TButton').pack(side=tk.RIGHT, padx=5)
@@ -351,7 +349,7 @@ class ProjectManagementApp:
         # Tiêu đề
         ttk.Label(main_frame, text="Chi tiết Công Việc", font=('Roboto', 16, 'bold'), foreground='#4CAF50').pack(pady=10)
     
-        # Frame cho form hiển thị thông tin (bố trí ngang)
+        # Frame cho form hiển thị thông tin
         form_frame = ttk.Frame(main_frame)
         form_frame.pack(pady=10, fill=tk.BOTH, expand=True)
     
@@ -386,13 +384,13 @@ class ProjectManagementApp:
     def create_task_screen(self):
         self.task_window = tk.Toplevel(self.root)
         self.task_window.title("Thêm công việc")
-        self.task_window.geometry("600x510")  # Tăng chiều rộng để chứa bố cục ngang
+        self.task_window.geometry("600x575") 
         self.task_window.configure(bg='white')
 
         main_frame = ttk.Frame(self.task_window, padding=20)
         main_frame.pack(fill=tk.BOTH, expand=True)
 
-        # Frame cho nút Lưu ở góc phải trên
+        # Frame cho nút Lưu 
         top_frame = ttk.Frame(main_frame)
         top_frame.pack(anchor="ne")
         ttk.Button(top_frame, text="Lưu", command=self.save_task).pack(side=tk.RIGHT, padx=5)
@@ -400,7 +398,7 @@ class ProjectManagementApp:
         # Tiêu đề
         ttk.Label(main_frame, text="Thêm Công Việc", font=('Roboto', 16, 'bold'), foreground='#4CAF50').pack(pady=10)
 
-        # Frame cho form nhập liệu (bố trí ngang)
+        # Frame cho form nhập liệu
         form_frame = ttk.Frame(main_frame)
         form_frame.pack(pady=10, fill=tk.BOTH, expand=True)
 
@@ -470,8 +468,7 @@ class ProjectManagementApp:
         btn_frame = ttk.Frame(main_frame)
         btn_frame.pack(pady=10)
         ttk.Button(btn_frame, text="Xóa người dùng", command=self.delete_user).pack(side=tk.LEFT, padx=5)
-
-    # Các hàm khác giữ nguyên từ code gốc
+    #Đồng bộ người dùng từ sheet
     def sync_users_from_sheet(self):
         try:
             data = self.login_sheet.get_all_values()
@@ -517,7 +514,7 @@ class ProjectManagementApp:
             self.sync_users_to_login_sheet()
         except Exception as e:
             messagebox.showerror("Lỗi", f"Không thể đồng bộ người dùng từ Google Sheet: {e}")
-
+    #Đồng bộ công việc từ sheet
     def sync_tasks_from_sheet(self):
         try:
             data = self.task_sheet.get_all_values()
@@ -599,7 +596,7 @@ class ProjectManagementApp:
                     self.update_task_in_sheet(task)
         except Exception as e:
             messagebox.showerror("Lỗi", f"Không thể đồng bộ công việc từ Google Sheet: {e}")
-
+    #Lưu cấu hình google sheet
     def save_config(self):
         self.config["TASK_SPREADSHEET_ID"] = self.task_spreadsheet_id_entry.get().strip()
         self.config["LOGIN_SPREADSHEET_ID"] = self.login_spreadsheet_id_entry.get().strip()
@@ -617,7 +614,7 @@ class ProjectManagementApp:
         
         write_json(CONFIG_FILE, self.config)
         self.setup_google_sheets()
-
+    #Mã hóa thông tin người dùng của json
     def encode_users_for_json(self, users):
         encoded_users = {}
         for username, info in users.items():
@@ -628,7 +625,7 @@ class ProjectManagementApp:
                 "full_name": encode_data(info["full_name"])
             }
         return encoded_users
-
+    #Thêm công việc vào sheet
     def append_task_to_sheet(self, task):
         try:
             if not self.task_sheet.get_all_values():
@@ -657,7 +654,7 @@ class ProjectManagementApp:
             print(f"Đã ghi công việc '{task['title']}' lên Google Sheet (Phân công)")
         except Exception as e:
             messagebox.showerror("Lỗi", f"Không thể ghi lên Google Sheet (Phân công): {e}")
-
+    #Thêm người dùng vào sheet
     def append_user_to_login_sheet(self, username, password, full_name, role):
         try:
             row = [username, password, full_name, role]
@@ -665,7 +662,7 @@ class ProjectManagementApp:
             print(f"Đã ghi thông tin đăng nhập của '{username}' lên Google Sheet (Đăng nhập)")
         except Exception as e:
             messagebox.showerror("Lỗi", f"Không thể ghi thông tin đăng nhập lên Google Sheet: {e}")
-
+    #Cập nhật thông tin người dùng
     def update_user_in_login_sheet(self, username, password, full_name, role):
         try:
             cell = self.login_sheet.find(username, in_column=1)
@@ -678,7 +675,7 @@ class ProjectManagementApp:
                 self.append_user_to_login_sheet(username, password, full_name, role)
         except Exception as e:
             messagebox.showerror("Lỗi", f"Không thể cập nhật thông tin đăng nhập trong Google Sheet: {e}")
-
+    #Xóa người dùng khỏi google sheet
     def delete_user_from_login_sheet(self, username):
         try:
             cell = self.login_sheet.find(username, in_column=1)
@@ -690,7 +687,7 @@ class ProjectManagementApp:
                 print(f"Không tìm thấy thông tin đăng nhập của '{username}' trong Google Sheet (Đăng nhập)")
         except Exception as e:
             messagebox.showerror("Lỗi", f"Không thể xóa thông tin đăng nhập khỏi Google Sheet: {e}")
-
+    #Đồng bộ người dùng lên google sheet
     def sync_users_to_login_sheet(self):
         try:
             if not self.login_sheet.get_all_values():
@@ -715,7 +712,7 @@ class ProjectManagementApp:
                     )
         except Exception as e:
             messagebox.showerror("Lỗi", f"Không thể đồng bộ thông tin người dùng lên Google Sheet (Đăng nhập): {e}")
-
+    #Cập nhật công việc
     def update_task_in_sheet(self, task):
         try:
             cell = self.task_sheet.find(task['id'], in_column=1)
@@ -741,7 +738,7 @@ class ProjectManagementApp:
                 self.append_task_to_sheet(task)
         except Exception as e:
             messagebox.showerror("Lỗi", f"Không thể cập nhật Google Sheet (Phân công): {e}")
-
+    #Xóa công việc khòi google sheet
     def delete_task_from_sheet(self, task_id):
         try:
             cell = self.task_sheet.find(task_id, in_column=1)
@@ -753,7 +750,7 @@ class ProjectManagementApp:
                 print(f"Không tìm thấy công việc với ID '{task_id}' trong Google Sheet (Phân công)")
         except Exception as e:
             messagebox.showerror("Lỗi", f"Không thể xóa khỏi Google Sheet (Phân công): {e}")
-
+    #Đăng nhập
     def login(self):
         username = self.username_entry.get()
         password = self.password_entry.get()
@@ -765,7 +762,7 @@ class ProjectManagementApp:
                 self.create_main_screen()
                 return
         messagebox.showerror("Lỗi", "Tên đăng nhập hoặc mật khẩu không đúng")
-
+    #Đăng ký
     def register(self):
         username = self.reg_username_entry.get()
         full_name = self.reg_fullname_entry.get()
@@ -793,7 +790,7 @@ class ProjectManagementApp:
         self.append_user_to_login_sheet(username, password, full_name, role)
         messagebox.showinfo("Thành công", "Đăng ký thành công")
         self.create_login_screen()
-
+    
     def load_tasks(self, tasks=None):
         for item in self.tree.get_children():
             self.tree.delete(item)
@@ -827,15 +824,15 @@ class ProjectManagementApp:
                 task["deadline"], 
                 task["created_at"]
             ), tags=tag)
-
+    #Lọc công việc bằng project
     def filter_tasks_by_project(self, *args):
         project = self.project_var.get()
-        if project == "All":
+        if project == "Tất cả":
             filtered_tasks = self.tasks
         else:
             filtered_tasks = [task for task in self.tasks if task["project_name"] == project]
         self.load_tasks(filtered_tasks)
-
+    #Tìm kiếm công việc
     def search_tasks(self):
         query = self.search_entry.get().lower()
         filtered_tasks = [
@@ -847,7 +844,7 @@ class ProjectManagementApp:
 
     def save_task(self):
         title = self.title_entry.get()
-        description = self.desc_entry.get("1.0", tk.END).strip()  # Đổi từ get() sang get("1.0", tk.END).strip()
+        description = self.desc_entry.get("1.0", tk.END).strip()  
         assignee = self.assignee_entry.get()
         project_name = self.project_entry.get()
         status = self.status_var.get()
@@ -892,14 +889,14 @@ class ProjectManagementApp:
 
         self.load_tasks()
         self.project_menu['menu'].delete(0, 'end')
-        projects = ["All"] + list(set(task["project_name"] for task in self.tasks))
+        projects = ["Tất cả"] + list(set(task["project_name"] for task in self.tasks))
         for project in projects:
             self.project_menu['menu'].add_command(label=project, command=lambda p=project: self.project_var.set(p))
 
         messagebox.showinfo("Thành công", "Công việc đã được thêm", parent=self.task_window)
         self.task_window.destroy()
 
-
+    #Giao diện sửa công việc
     def edit_task_screen(self):
         selected = self.tree.selection()
         if not selected:
@@ -927,7 +924,7 @@ class ProjectManagementApp:
         main_frame = ttk.Frame(self.task_window, padding=20)
         main_frame.pack(fill=tk.BOTH, expand=True)
 
-        # Frame cho nút Lưu ở góc phải trên
+        # Frame cho nút Lưu
         top_frame = ttk.Frame(main_frame)
         top_frame.pack(anchor="ne")
         ttk.Button(top_frame, text="Lưu", command=lambda: self.update_task(task_id)).pack(side=tk.RIGHT, padx=5)
@@ -940,7 +937,7 @@ class ProjectManagementApp:
         form_frame.pack(pady=10, fill=tk.BOTH, expand=True)
 
         if can_edit_full:
-            self.task_window.geometry("600x510")
+            self.task_window.geometry("600x575")
 
             # Cột 1: Nhãn
             ttk.Label(form_frame, text="Tiêu đề").grid(row=0, column=0, padx=5, pady=5, sticky='e')
@@ -994,12 +991,12 @@ class ProjectManagementApp:
 
             # Khởi tạo các trường ẩn để tránh lỗi
             self.title_entry = ttk.Entry(form_frame, state="disabled")
-            self.desc_entry = Text(form_frame, height=5, width=30, state="disabled")  # Đổi thành Text nhưng disabled
+            self.desc_entry = Text(form_frame, height=5, width=30, state="disabled") 
             self.assignee_entry = ttk.Entry(form_frame, state="disabled")
             self.project_entry = ttk.Entry(form_frame, state="disabled")
             self.deadline_entry = ttk.Entry(form_frame, state="disabled")
             self.notes_entry = Text(form_frame, height=5, width=30, state="disabled")
-
+    
     def update_task(self, task_id):
         task = next((t for t in self.tasks if t["id"] == task_id), None)
         if not task:
@@ -1016,7 +1013,7 @@ class ProjectManagementApp:
 
         if can_edit_full:
             title = self.title_entry.get()
-            description = self.desc_entry.get("1.0", tk.END).strip()  # Đổi từ get() sang get("1.0", tk.END).strip()
+            description = self.desc_entry.get("1.0", tk.END).strip()
             assignee = self.assignee_entry.get()
             project_name = self.project_entry.get()
             status = self.status_var.get()
@@ -1065,7 +1062,7 @@ class ProjectManagementApp:
         write_json(TASKS_FILE, self.tasks)
         self.load_tasks()
         self.project_menu['menu'].delete(0, 'end')
-        projects = ["All"] + list(set(task["project_name"] for task in self.tasks))
+        projects = ["Tất cả"] + list(set(task["project_name"] for task in self.tasks))
         for project in projects:
             self.project_menu['menu'].add_command(label=project, command=lambda p=project: self.project_var.set(p))
 
@@ -1103,7 +1100,7 @@ class ProjectManagementApp:
         self.load_tasks()
         messagebox.showinfo("Thành công", "Công việc đã được xóa")
         self.project_menu['menu'].delete(0, 'end')
-        projects = ["All"] + list(set(task["project_name"] for task in self.tasks))
+        projects = ["Tất cả"] + list(set(task["project_name"] for task in self.tasks))
         for project in projects:
             self.project_menu['menu'].add_command(label=project, command=lambda p=project: self.project_var.set(p))
 
