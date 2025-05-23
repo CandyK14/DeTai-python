@@ -7,10 +7,6 @@ import re
 from datetime import datetime, timedelta
 import uuid
 import base64
-from reportlab.lib.pagesizes import A4
-from reportlab.pdfgen import canvas
-import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import gspread
 from google.oauth2.service_account import Credentials
 
@@ -327,7 +323,6 @@ class ProjectManagementApp:
             ttk.Button(btn_frame, text="Cấu hình Google Sheets", command=self.create_config_screen).pack(side=tk.LEFT, padx=5)
     
         self.load_tasks()
-        self.check_deadline_reminders()
 
     def show_task_details(self, event):
         item = self.tree.identify_row(event.y)
@@ -849,13 +844,6 @@ class ProjectManagementApp:
         ]
         self.load_tasks(filtered_tasks)
 
-    def check_deadline_reminders(self):
-        now = datetime.now()
-        for task in self.tasks:
-            deadline = datetime.strptime(task["deadline"], "%Y-%m-%d %H:%M:%S")
-            time_diff = (deadline - now).total_seconds() / 3600
-            if 0 < time_diff <= 24 and task["status"] != "Done":
-                messagebox.showwarning("Nhắc nhở", f"Công việc '{task['title']}' sắp đến hạn: {task['deadline']}")
 
     def save_task(self):
         title = self.title_entry.get()
