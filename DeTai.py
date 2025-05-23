@@ -388,55 +388,55 @@ class ProjectManagementApp:
         self.task_window.title("Thêm công việc")
         self.task_window.geometry("600x510")  # Tăng chiều rộng để chứa bố cục ngang
         self.task_window.configure(bg='white')
-    
+
         main_frame = ttk.Frame(self.task_window, padding=20)
         main_frame.pack(fill=tk.BOTH, expand=True)
-    
+
         # Frame cho nút Lưu ở góc phải trên
         top_frame = ttk.Frame(main_frame)
         top_frame.pack(anchor="ne")
         ttk.Button(top_frame, text="Lưu", command=self.save_task).pack(side=tk.RIGHT, padx=5)
-    
+
         # Tiêu đề
         ttk.Label(main_frame, text="Thêm Công Việc", font=('Roboto', 16, 'bold'), foreground='#4CAF50').pack(pady=10)
-    
+
         # Frame cho form nhập liệu (bố trí ngang)
         form_frame = ttk.Frame(main_frame)
         form_frame.pack(pady=10, fill=tk.BOTH, expand=True)
-    
+
         # Cột 1: Nhãn
         ttk.Label(form_frame, text="Tiêu đề").grid(row=0, column=0, padx=5, pady=5, sticky='e')
-        ttk.Label(form_frame, text="Mô tả").grid(row=1, column=0, padx=5, pady=5, sticky='e')
+        ttk.Label(form_frame, text="Mô tả").grid(row=1, column=0, padx=5, pady=5, sticky='ne')  # Đổi sticky thành 'ne' để căn chỉnh giống ghi chú
         ttk.Label(form_frame, text="Người phụ trách").grid(row=2, column=0, padx=5, pady=5, sticky='e')
         ttk.Label(form_frame, text="Dự án").grid(row=3, column=0, padx=5, pady=5, sticky='e')
         ttk.Label(form_frame, text="Trạng thái").grid(row=4, column=0, padx=5, pady=5, sticky='e')
         ttk.Label(form_frame, text="Hạn chót").grid(row=5, column=0, padx=5, pady=5, sticky='e')
         ttk.Label(form_frame, text="Ghi chú").grid(row=6, column=0, padx=5, pady=5, sticky='ne')
-    
+
         # Cột 2: Trường nhập liệu
         self.title_entry = ttk.Entry(form_frame, width=30)
         self.title_entry.grid(row=0, column=1, padx=5, pady=5, sticky='w')
-    
-        self.desc_entry = ttk.Entry(form_frame, width=30)
+
+        self.desc_entry = Text(form_frame, height=5, width=30, font=('Roboto', 11))  # Đổi từ Entry sang Text
         self.desc_entry.grid(row=1, column=1, padx=5, pady=5, sticky='w')
-    
+
         self.assignee_entry = ttk.Entry(form_frame, width=30)
         self.assignee_entry.grid(row=2, column=1, padx=5, pady=5, sticky='w')
-    
+
         projects = list(set(task["project_name"] for task in self.tasks))
         if not projects:
             projects = ["Default Project"]
         self.project_entry = ttk.Entry(form_frame, width=30)
         self.project_entry.insert(0, projects[0])
         self.project_entry.grid(row=3, column=1, padx=5, pady=5, sticky='w')
-    
+
         self.status_var = tk.StringVar(value="Todo")
         ttk.OptionMenu(form_frame, self.status_var, "Todo", "Todo", "In Progress", "Done").grid(row=4, column=1, padx=5, pady=5, sticky='w')
-    
+
         self.deadline_entry = ttk.Entry(form_frame, width=30)
         self.deadline_entry.insert(0, (datetime.now() + timedelta(days=7)).strftime("%Y-%m-%d %H:%M:%S"))
         self.deadline_entry.grid(row=5, column=1, padx=5, pady=5, sticky='w')
-    
+
         self.notes_entry = Text(form_frame, height=5, width=30, font=('Roboto', 11))
         self.notes_entry.grid(row=6, column=1, padx=5, pady=5, sticky='w')
 
@@ -847,28 +847,28 @@ class ProjectManagementApp:
 
     def save_task(self):
         title = self.title_entry.get()
-        description = self.desc_entry.get()
+        description = self.desc_entry.get("1.0", tk.END).strip()  # Đổi từ get() sang get("1.0", tk.END).strip()
         assignee = self.assignee_entry.get()
         project_name = self.project_entry.get()
         status = self.status_var.get()
         deadline = self.deadline_entry.get()
         notes = self.notes_entry.get("1.0", tk.END).strip()
-    
+
         if not title or not assignee or not project_name:
             messagebox.showerror("Lỗi", "Vui lòng nhập đầy đủ thông tin", parent=self.task_window)
             return
-    
+
         full_names = [info["full_name"] for info in self.users.values()]
         if assignee not in full_names:
             messagebox.showerror("Lỗi", f"Người phụ trách '{assignee}' không tồn tại", parent=self.task_window)
             return
-    
+
         try:
             datetime.strptime(deadline, "%Y-%m-%d %H:%M:%S")
         except:
             messagebox.showerror("Lỗi", "Hạn chót không đúng định dạng (YYYY-MM-DD HH:MM:SS)", parent=self.task_window)
             return
-    
+
         task = {
             "id": str(uuid.uuid4()),
             "title": title,
@@ -883,19 +883,19 @@ class ProjectManagementApp:
             "last_modified_by": self.current_user,
             "last_modified_at": datetime.now().strftime("%Y-%m-%d %H:%M:%S")
         }
-    
+
         self.tasks.append(task)
         self.log_history("Created", task)
         write_json(TASKS_FILE, self.tasks)
-    
+
         self.append_task_to_sheet(task)
-    
+
         self.load_tasks()
         self.project_menu['menu'].delete(0, 'end')
         projects = ["All"] + list(set(task["project_name"] for task in self.tasks))
         for project in projects:
             self.project_menu['menu'].add_command(label=project, command=lambda p=project: self.project_var.set(p))
-    
+
         messagebox.showinfo("Thành công", "Công việc đã được thêm", parent=self.task_window)
         self.task_window.destroy()
 
@@ -905,96 +905,96 @@ class ProjectManagementApp:
         if not selected:
             messagebox.showerror("Lỗi", "Vui lòng chọn một công việc")
             return
-    
+
         task_id = self.tree.item(selected)["values"][0]
         task = next((t for t in self.tasks if t["id"] == task_id), None)
         if not task:
             messagebox.showerror("Lỗi", "Không tìm thấy công việc")
             return
-    
+
         current_full_name = self.users[self.current_user]["full_name"]
         can_edit_full = self.is_admin or task["created_by"] == self.current_user
         can_edit_status = task["assignee"] == current_full_name
-    
+
         if not (can_edit_full or can_edit_status):
             messagebox.showerror("Lỗi", "Bạn không có quyền chỉnh sửa công việc này")
             return
-    
+
         self.task_window = tk.Toplevel(self.root)
         self.task_window.title("Sửa công việc")
         self.task_window.configure(bg='white')
-    
+
         main_frame = ttk.Frame(self.task_window, padding=20)
         main_frame.pack(fill=tk.BOTH, expand=True)
-    
+
         # Frame cho nút Lưu ở góc phải trên
         top_frame = ttk.Frame(main_frame)
         top_frame.pack(anchor="ne")
         ttk.Button(top_frame, text="Lưu", command=lambda: self.update_task(task_id)).pack(side=tk.RIGHT, padx=5)
-    
+
         # Tiêu đề
         ttk.Label(main_frame, text="Sửa Công Việc", font=('Roboto', 16, 'bold'), foreground='#4CAF50').pack(pady=10)
-    
+
         # Frame cho form nhập liệu
         form_frame = ttk.Frame(main_frame)
         form_frame.pack(pady=10, fill=tk.BOTH, expand=True)
-    
+
         if can_edit_full:
             self.task_window.geometry("600x510")
-        
+
             # Cột 1: Nhãn
             ttk.Label(form_frame, text="Tiêu đề").grid(row=0, column=0, padx=5, pady=5, sticky='e')
-            ttk.Label(form_frame, text="Mô tả").grid(row=1, column=0, padx=5, pady=5, sticky='e')
+            ttk.Label(form_frame, text="Mô tả").grid(row=1, column=0, padx=5, pady=5, sticky='ne')  # Đổi sticky thành 'ne'
             ttk.Label(form_frame, text="Người phụ trách").grid(row=2, column=0, padx=5, pady=5, sticky='e')
             ttk.Label(form_frame, text="Dự án").grid(row=3, column=0, padx=5, pady=5, sticky='e')
             ttk.Label(form_frame, text="Trạng thái").grid(row=4, column=0, padx=5, pady=5, sticky='e')
             ttk.Label(form_frame, text="Hạn chót").grid(row=5, column=0, padx=5, pady=5, sticky='e')
             ttk.Label(form_frame, text="Ghi chú").grid(row=6, column=0, padx=5, pady=5, sticky='ne')
-        
+
             # Cột 2: Trường nhập liệu
             self.title_entry = ttk.Entry(form_frame, width=30)
             self.title_entry.insert(0, task["title"])
             self.title_entry.grid(row=0, column=1, padx=5, pady=5, sticky='w')
-        
-            self.desc_entry = ttk.Entry(form_frame, width=30)
-            self.desc_entry.insert(0, task["description"])
+
+            self.desc_entry = Text(form_frame, height=5, width=30, font=('Roboto', 11))  # Đổi từ Entry sang Text
+            self.desc_entry.insert(tk.END, task["description"])
             self.desc_entry.grid(row=1, column=1, padx=5, pady=5, sticky='w')
-        
+
             self.assignee_entry = ttk.Entry(form_frame, width=30)
             self.assignee_entry.insert(0, task["assignee"])
             self.assignee_entry.grid(row=2, column=1, padx=5, pady=5, sticky='w')
-        
+
             self.project_entry = ttk.Entry(form_frame, width=30)
             self.project_entry.insert(0, task["project_name"])
             self.project_entry.grid(row=3, column=1, padx=5, pady=5, sticky='w')
-        
+
             self.status_var = tk.StringVar(value=task["status"])
             ttk.OptionMenu(form_frame, self.status_var, task["status"], "Todo", "In Progress", "Done").grid(row=4, column=1, padx=5, pady=5, sticky='w')
-        
+
             self.deadline_entry = ttk.Entry(form_frame, width=30)
             self.deadline_entry.insert(0, task["deadline"])
             self.deadline_entry.grid(row=5, column=1, padx=5, pady=5, sticky='w')
-        
+
             self.notes_entry = Text(form_frame, height=5, width=30, font=('Roboto', 11))
             self.notes_entry.insert(tk.END, task["notes"])
             self.notes_entry.grid(row=6, column=1, padx=5, pady=5, sticky='w')
         else:
             self.task_window.geometry("600x300")
-        
+
             # Cột 1: Nhãn
             ttk.Label(form_frame, text="Tiêu đề").grid(row=0, column=0, padx=5, pady=5, sticky='e')
             ttk.Label(form_frame, text="Người phụ trách").grid(row=1, column=0, padx=5, pady=5, sticky='e')
             ttk.Label(form_frame, text="Trạng thái").grid(row=2, column=0, padx=5, pady=5, sticky='e')
-        
+
             # Cột 2: Trường nhập liệu
             ttk.Label(form_frame, text=f"{task['title']} (Không thể chỉnh sửa)", state="disabled").grid(row=0, column=1, padx=5, pady=5, sticky='w')
             ttk.Label(form_frame, text=f"{task['assignee']} (Không thể chỉnh sửa)", state="disabled").grid(row=1, column=1, padx=5, pady=5, sticky='w')
             self.status_var = tk.StringVar(value=task["status"])
             ttk.OptionMenu(form_frame, self.status_var, task["status"], "Todo", "In Progress", "Done").grid(row=2, column=1, padx=5, pady=5, sticky='w')
-        
+
             # Khởi tạo các trường ẩn để tránh lỗi
             self.title_entry = ttk.Entry(form_frame, state="disabled")
-            self.desc_entry = ttk.Entry(form_frame, state="disabled")
+            self.desc_entry = Text(form_frame, height=5, width=30, state="disabled")  # Đổi thành Text nhưng disabled
             self.assignee_entry = ttk.Entry(form_frame, state="disabled")
             self.project_entry = ttk.Entry(form_frame, state="disabled")
             self.deadline_entry = ttk.Entry(form_frame, state="disabled")
@@ -1005,33 +1005,33 @@ class ProjectManagementApp:
         if not task:
             messagebox.showerror("Lỗi", "Không tìm thấy công việc", parent=self.task_window)
             return
-    
+
         current_full_name = self.users[self.current_user]["full_name"]
         can_edit_full = self.is_admin or task["created_by"] == self.current_user
         can_edit_status = task["assignee"] == current_full_name
-    
+
         if not (can_edit_full or can_edit_status):
             messagebox.showerror("Lỗi", "Bạn không có quyền chỉnh sửa công việc này", parent=self.task_window)
             return
-    
+
         if can_edit_full:
             title = self.title_entry.get()
-            description = self.desc_entry.get()
+            description = self.desc_entry.get("1.0", tk.END).strip()  # Đổi từ get() sang get("1.0", tk.END).strip()
             assignee = self.assignee_entry.get()
             project_name = self.project_entry.get()
             status = self.status_var.get()
             deadline = self.deadline_entry.get()
             notes = self.notes_entry.get("1.0", tk.END).strip()
-        
+
             if not title or not assignee or not project_name:
                 messagebox.showerror("Lỗi", "Vui lòng nhập đầy đủ thông tin", parent=self.task_window)
                 return
-        
+
             full_names = [info["full_name"] for info in self.users.values()]
             if assignee not in full_names:
                 messagebox.showerror("Lỗi", f"Người phụ trách '{assignee}' không tồn tại", parent=self.task_window)
                 return
-        
+
             try:
                 datetime.strptime(deadline, "%Y-%m-%d %H:%M:%S")
             except:
@@ -1045,7 +1045,7 @@ class ProjectManagementApp:
             project_name = task["project_name"]
             deadline = task["deadline"]
             notes = task["notes"]
-    
+
         for task in self.tasks:
             if task["id"] == task_id:
                 task["title"] = title
@@ -1058,17 +1058,17 @@ class ProjectManagementApp:
                 task["last_modified_by"] = self.current_user
                 task["last_modified_at"] = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
                 self.log_history("Updated", task)
-            
+
                 self.update_task_in_sheet(task)
                 break
-    
+
         write_json(TASKS_FILE, self.tasks)
         self.load_tasks()
         self.project_menu['menu'].delete(0, 'end')
         projects = ["All"] + list(set(task["project_name"] for task in self.tasks))
         for project in projects:
             self.project_menu['menu'].add_command(label=project, command=lambda p=project: self.project_var.set(p))
-    
+
         messagebox.showinfo("Thành công", "Công việc đã được cập nhật", parent=self.task_window)
         self.task_window.destroy()
 
@@ -1077,25 +1077,29 @@ class ProjectManagementApp:
         if not selected:
             messagebox.showerror("Lỗi", "Vui lòng chọn một công việc")
             return
-        
-        if not self.is_admin:
-            messagebox.showerror("Lỗi", "Chỉ quản trị viên mới có thể xóa công việc")
-            return
-        
+    
         task_id = self.tree.item(selected)["values"][0]
-        task_title = self.tree.item(selected)["values"][1]
         task = next((t for t in self.tasks if t["id"] == task_id), None)
-        
+        if not task:
+            messagebox.showerror("Lỗi", "Không tìm thấy công việc")
+            return
+    
+        # Kiểm tra quyền xóa: chỉ admin hoặc người tạo công việc được xóa
+        if not (self.is_admin or task["created_by"] == self.current_user):
+            messagebox.showerror("Lỗi", "Bạn không có quyền xóa công việc này")
+            return
+    
+        task_title = self.tree.item(selected)["values"][1]
         confirm = messagebox.askyesno("Xác nhận", f"Bạn có chắc muốn xóa công việc '{task_title}'?")
         if not confirm:
             return
-        
+    
         self.log_history("Deleted", task)
         self.tasks = [task for task in self.tasks if task["id"] != task_id]
         write_json(TASKS_FILE, self.tasks)
-        
+    
         self.delete_task_from_sheet(task_id)
-        
+    
         self.load_tasks()
         messagebox.showinfo("Thành công", "Công việc đã được xóa")
         self.project_menu['menu'].delete(0, 'end')
