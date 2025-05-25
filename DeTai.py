@@ -1123,7 +1123,7 @@ class ProjectManagementApp:
         
         history_window = tk.Toplevel(self.root)
         history_window.title("Lịch sử thay đổi")
-        history_window.geometry("600x400")
+        history_window.geometry("1100x400")
         history_window.configure(bg='white')
         
         main_frame = ttk.Frame(history_window, padding=20)
