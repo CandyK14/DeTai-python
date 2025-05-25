@@ -404,7 +404,7 @@ class ProjectManagementApp:
 
         # Cột 1: Nhãn
         ttk.Label(form_frame, text="Tiêu đề").grid(row=0, column=0, padx=5, pady=5, sticky='e')
-        ttk.Label(form_frame, text="Mô tả").grid(row=1, column=0, padx=5, pady=5, sticky='ne')  # Đổi sticky thành 'ne' để căn chỉnh giống ghi chú
+        ttk.Label(form_frame, text="Mô tả").grid(row=1, column=0, padx=5, pady=5, sticky='ne')
         ttk.Label(form_frame, text="Người phụ trách").grid(row=2, column=0, padx=5, pady=5, sticky='e')
         ttk.Label(form_frame, text="Dự án").grid(row=3, column=0, padx=5, pady=5, sticky='e')
         ttk.Label(form_frame, text="Trạng thái").grid(row=4, column=0, padx=5, pady=5, sticky='e')
@@ -415,7 +415,7 @@ class ProjectManagementApp:
         self.title_entry = ttk.Entry(form_frame, width=30)
         self.title_entry.grid(row=0, column=1, padx=5, pady=5, sticky='w')
 
-        self.desc_entry = Text(form_frame, height=5, width=30, font=('Roboto', 11))  # Đổi từ Entry sang Text
+        self.desc_entry = Text(form_frame, height=5, width=30, font=('Roboto', 11))
         self.desc_entry.grid(row=1, column=1, padx=5, pady=5, sticky='w')
 
         self.assignee_entry = ttk.Entry(form_frame, width=30)
